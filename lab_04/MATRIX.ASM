@@ -90,7 +90,7 @@ CODE SEGMENT PARA PUBLIC 'CODE'
         xor ax, ax
         mov al, min_row
         mov si, ax
-        ;mov di, dx
+        mov di, dx
         call calc_shift
         push bx
 
