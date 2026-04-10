@@ -49,6 +49,7 @@ CODE SEGMENT PARA PUBLIC 'CODE' USE16
         push si
         push di
 
+        ; Достаточно сбросить длину; DOS сам заполняет введенные символы.
         mov byte ptr buffer, 7
         mov byte ptr buffer[1], 0
 

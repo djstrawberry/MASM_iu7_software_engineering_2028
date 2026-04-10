@@ -51,7 +51,7 @@ CODE SEGMENT PARA PUBLIC 'CODE' USE16
 
             ; Display menu
             lea dx, menu_prompt
-            call print_menu_string
+            call print_menu_string_plain
 
             ; Get user choice
             call input_digit

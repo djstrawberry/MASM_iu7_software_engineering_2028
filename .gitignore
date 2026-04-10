@@ -1,0 +1,9 @@
+# Build artifacts
+*.obj
+*.exe
+
+# Optional assembler/linker byproducts
+*.map
+*.lst
+*.ilk
+*.pdb
