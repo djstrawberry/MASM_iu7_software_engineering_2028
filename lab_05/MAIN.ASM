@@ -2,14 +2,15 @@
 
 PUBLIC number
 
-; Temporary: menu handlers are stubbed locally until real implementations are ready.
-; EXTRN input_signed_decimal: NEAR
-; EXTRN print_unsigned_binary: NEAR
-; EXTRN print_signed_hex_truncated: NEAR
-; EXTRN find_min_power_of_2_above: NEAR
 EXTRN print_string: NEAR
 EXTRN print_menu_string: NEAR
+EXTRN print_menu_string_plain: NEAR
 EXTRN input_digit: NEAR
+EXTRN input_signed_decimal: NEAR
+EXTRN print_unsigned_binary: NEAR
+EXTRN print_signed_hex_truncated: NEAR
+EXTRN find_min_power_of_2_above: NEAR
+EXTRN exit_program: NEAR
 
 DATA SEGMENT PARA PUBLIC 'DATA' USE16
     number dw 0
@@ -27,14 +28,7 @@ DATA SEGMENT PARA PUBLIC 'DATA' USE16
              db 'Your choice: $'
 
     error_msg db 'Invalid choice. Please read the menu :).', 13, 10, '$'
-    selected_msg db 13, 10, 'Selected option: $'
-    continue_msg db 'Press any key to continue...$'
-
-    proc_table dw OFFSET read_signed_decimal
-               dw OFFSET print_unsigned_binary
-               dw OFFSET print_signed_hex_truncated
-               dw OFFSET find_min_power_of_2_above
-               dw OFFSET exit_program
+    proc_table dw 5 dup (?)
 DATA ENDS
 
 CODE SEGMENT PARA PUBLIC 'CODE' USE16
@@ -44,10 +38,19 @@ CODE SEGMENT PARA PUBLIC 'CODE' USE16
         mov ax, DATA
         mov ds, ax
 
+        mov word ptr proc_table, OFFSET input_signed_decimal
+        mov word ptr proc_table + 2, OFFSET print_unsigned_binary
+        mov word ptr proc_table + 4, OFFSET print_signed_hex_truncated
+        mov word ptr proc_table + 6, OFFSET find_min_power_of_2_above
+        mov word ptr proc_table + 8, OFFSET exit_program
+
         main_loop:
+            mov ax, DATA
+            mov ds, ax
+
             ; Display menu
             lea dx, menu_prompt
-            call print_menu_string
+            call print_menu_string_plain
 
             ; Get user choice
             call input_digit
@@ -59,68 +62,32 @@ CODE SEGMENT PARA PUBLIC 'CODE' USE16
             ja invalid_choice
 
             mov selected_choice, al
-
-            lea dx, selected_msg
-            mov ah, 09h
-            int 21h
-
-            mov dl, selected_choice
-            add dl, '0'
-            mov ah, 02h
-            int 21h
-
-            mov dl, 0Dh
-            mov ah, 02h
-            int 21h
-            mov dl, 0Ah
-            int 21h
-
-            lea dx, continue_msg
-            call print_string
-            mov ah, 08h
-            int 21h
-
-            mov al, selected_choice
-
-            ; Call the corresponding procedure from the table
-            dec al
-            mov bl, al 
-            xor bh, bh      
+            xor bx, bx
+            mov bl, selected_choice
+            dec bl
             shl bx, 1
-            call [proc_table + bx]
+
+            ; Required by task: array-indexed dispatch by menu index.
+            push ds
+            call word ptr [proc_table + bx]
+            pop ds
+
+            cmp selected_choice, 1
+            jne skip_store_number
+            mov word ptr [number], ax
+
+        skip_store_number:
+
+            mov ax, DATA
+            mov ds, ax
 
             jmp main_loop
 
         invalid_choice:
             lea dx, error_msg
             call print_string
-            lea dx, continue_msg
-            call print_string
-            mov ah, 08h
-            int 21h
             jmp main_loop
-    main ENDP   
-
-    read_signed_decimal PROC NEAR
-        ret
-    read_signed_decimal ENDP
-
-    print_unsigned_binary PROC NEAR
-        ret
-    print_unsigned_binary ENDP
-
-    print_signed_hex_truncated PROC NEAR
-        ret
-    print_signed_hex_truncated ENDP
-
-    find_min_power_of_2_above PROC NEAR
-        ret
-    find_min_power_of_2_above ENDP
-
-    exit_program PROC NEAR
-        mov ax, 4C00h
-        int 21h
-    exit_program ENDP
+    main ENDP
     
 CODE ENDS
 END main

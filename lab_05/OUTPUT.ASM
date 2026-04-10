@@ -1,6 +1,10 @@
-PUBLIC print_string, print_newline, print_menu_string
+.386
 
-CODE SEGMENT PARA PUBLIC 'CODE'
+PUBLIC print_string, print_newline, print_menu_string, print_menu_string_plain
+
+;EXTRN number: WORD
+
+CODE SEGMENT PARA PUBLIC 'CODE' USE16
     assume CS:CODE
 
     print_newline PROC near
@@ -17,9 +21,13 @@ CODE SEGMENT PARA PUBLIC 'CODE'
     print_newline ENDP
 
     print_string PROC near
+        push ax
+        push dx
         mov ah, 9
         int 21h
         call print_newline
+        pop dx
+        pop ax
         ret
     print_string ENDP
 
@@ -120,6 +128,76 @@ CODE SEGMENT PARA PUBLIC 'CODE'
         pop ax
         ret
     print_menu_string ENDP
+
+    ; Plain DOS menu output for debugging (no VRAM writes).
+    print_menu_string_plain PROC near
+        push ax
+        push dx
+        mov ah, 9
+        int 21h
+        call print_newline
+        pop dx
+        pop ax
+        ret
+    print_menu_string_plain ENDP
+
+    print_hex_word PROC NEAR
+        push ax
+        push bx
+        push cx
+        push dx
+        mov cx, 4
+        mov bx, ax
+    next_hex:
+        rol bx, 4
+        mov dl, bl
+        and dl, 0Fh
+        add dl, '0'
+        cmp dl, '9'
+        jbe print_digit
+        add dl, 7          ; для A-F
+    print_digit:
+        mov ah, 2
+        int 21h
+        loop next_hex
+        pop dx
+        pop cx
+        pop bx
+        pop ax
+        ret
+    print_hex_word ENDP
+
+    ; show_unsigned_binary PROC NEAR
+    ; push ax
+    ; push cx
+    ; push dx
+    ; push bx
+
+    ; mov ax, word ptr [number]
+    ; mov cx, 16
+    ; mov bx, 8000h
+
+    ; next_bit:
+    ;     test ax, bx
+    ;     jz print_zero
+    ;     mov dl, '1'
+    ;     jmp print_char
+    ; print_zero:
+    ;     mov dl, '0'
+    ; print_char:
+    ;     mov ah, 2
+    ;     int 21h
+    ;     shr bx, 1       ; сдвигаем маску вправо
+    ;     loop next_bit
+
+    ;     call print_newline
+
+    ;     pop bx
+    ;     pop dx
+    ;     pop cx
+    ;     pop ax
+    ;     ret
+    ; show_unsigned_binary ENDP
 
 CODE ENDS
 END
