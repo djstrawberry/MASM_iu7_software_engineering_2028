@@ -1,6 +1,8 @@
-PUBLIC print_string, print_newline, print_menu_string
+.386
 
-CODE SEGMENT PARA PUBLIC 'CODE'
+PUBLIC print_string, print_newline, print_menu_string, print_menu_string_plain
+
+CODE SEGMENT PARA PUBLIC 'CODE' USE16
     assume CS:CODE
 
     print_newline PROC near
@@ -17,14 +19,17 @@ CODE SEGMENT PARA PUBLIC 'CODE'
     print_newline ENDP
 
     print_string PROC near
+        push ax
+        push dx
         mov ah, 9
         int 21h
         call print_newline
+        pop dx
+        pop ax
         ret
     print_string ENDP
 
-    ; Prints $-terminated string in light magenta directly to text VRAM.
-    ; Input: DS:DX -> string ending with '$'
+    ; Prints menu directly to text VRAM.
     print_menu_string PROC near
         push ax
         push bx
@@ -44,6 +49,7 @@ CODE SEGMENT PARA PUBLIC 'CODE'
         mov dx, 184Fh
         int 10h
 
+        ; Start at top-left corner of the screen.
         mov dh, 0
         mov dl, 0
         mov ah, 02h
@@ -67,16 +73,16 @@ CODE SEGMENT PARA PUBLIC 'CODE'
         xor ax, ax
         mov al, dh
         mov bl, 80
-        mul bl
+        mul bl ; AX = Y * 80
         xor bx, bx
         mov bl, dl
-        add ax, bx
+        add ax, bx ; AX = Y * 80 + X
         shl ax, 1
         mov di, ax
 
         mov al, [si]
         mov es:[di], al
-        mov byte ptr es:[di+1], 0Dh
+        mov byte ptr es:[di+1], 0Dh ; Magenta! <3
 
         inc dl
         cmp dl, 80
@@ -120,6 +126,44 @@ CODE SEGMENT PARA PUBLIC 'CODE'
         pop ax
         ret
     print_menu_string ENDP
+
+    ; Plain DOS menu output for debugging (no VRAM writes).
+    print_menu_string_plain PROC near
+        push ax
+        push dx
+        mov ah, 9
+        int 21h
+        call print_newline
+        pop dx
+        pop ax
+        ret
+    print_menu_string_plain ENDP
+
+    print_hex_word PROC NEAR
+        push ax
+        push bx
+        push cx
+        push dx
+        mov cx, 4
+        mov bx, ax
+    next_hex:
+        rol bx, 4
+        mov dl, bl
+        and dl, 0Fh
+        add dl, '0'
+        cmp dl, '9'
+        jbe print_digit
+        add dl, 7 ; For A-F
+    print_digit:
+        mov ah, 2
+        int 21h
+        loop next_hex
+        pop dx
+        pop cx
+        pop bx
+        pop ax
+        ret
+    print_hex_word ENDP
 
 CODE ENDS
 END
