@@ -1,6 +1,7 @@
 # Build artifacts
 *.obj
 *.exe
+*.com
 
 # Optional assembler/linker byproducts
 *.map
