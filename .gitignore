@@ -8,3 +8,11 @@
 *.lst
 *.ilk
 *.pdb
+
+# Temp VS files
+.vs/
+Debug/
+Release/
+x64/
+x86/
+CppProperties.json
