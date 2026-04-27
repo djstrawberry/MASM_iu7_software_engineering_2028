@@ -1,4 +1,11 @@
 #include <iostream>
+#include <string>
+
+#define CYAN    "\033[36m"
+#define RESET   "\033[0m"
+
+void input_string(char* buffer, size_t size);
+void demo_overlap(void);
 
 #ifndef _M_X64
 static size_t my_strlen_x86(const char* str);
@@ -20,12 +27,15 @@ auto my_strlen = my_strlen_x86;
 
 int main(void)
 {
-    const char* str = "Hui pipisa";
-    std::cout << my_strlen(str) << std::endl;
+    char user_str[100];
+    input_string(user_str, sizeof(user_str));
 
-    char buffer[20] = "0123456789";
-    my_copy(buffer + 2, buffer, 5);
-    std::cout << "After copy:  " << buffer << std::endl;
+    std::cout << CYAN << "Length: " << my_strlen(user_str) << RESET << std::endl;
+
+    char buffer[120] = { 0 };
+    my_copy(buffer, user_str, my_strlen(user_str));
+
+    std::cout << CYAN << "Copied string: " << buffer << RESET << std::endl;
 
     return 0;
 }
@@ -34,23 +44,36 @@ int main(void)
 static size_t my_strlen_x86(const char* str)
 {
     size_t len = 0;
-
     __asm
     {
         mov edi, str
         mov ebx, edi
-
         mov al, 0
         mov ecx, -1
-
         cld
         repne scasb
-
         sub edi, ebx
         dec edi
         mov len, edi
     }
-
     return len;
 }
 #endif
+
+void input_string(char* buffer, size_t size)
+{
+    std::cout << CYAN << "Enter your string: " << RESET;
+    std::cin.getline(buffer, size);
+}
+
+void demo_overlap(void)
+{
+    char buffer[20] = "0123456789";
+
+    std::cout << "\n--- Overlap Demo ---" << std::endl;
+    std::cout << "Original: " << CYAN << buffer << RESET << std::endl;
+
+    my_copy(buffer + 2, buffer, 5);
+
+    std::cout << "After copy (buffer+2, buffer, 5): " << CYAN << buffer << RESET << std::endl;
+}

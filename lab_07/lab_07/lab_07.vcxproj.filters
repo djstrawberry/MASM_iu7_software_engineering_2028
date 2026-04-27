@@ -20,15 +20,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="copy_x64.asm">
-      <Filter>Исходные файлы</Filter>
-    </MASM>
-    <MASM Include="my_strlen_x64.asm">
+    <MASM Include="copy_x86.asm">
       <Filter>Исходные файлы</Filter>
     </MASM>
   </ItemGroup>
   <ItemGroup>
-    <None Include="copy_x86.asm">
+    <None Include="copy_x64.asm">
+      <Filter>Исходные файлы</Filter>
+    </None>
+    <None Include="my_strlen_x64.asm">
       <Filter>Исходные файлы</Filter>
     </None>
   </ItemGroup>

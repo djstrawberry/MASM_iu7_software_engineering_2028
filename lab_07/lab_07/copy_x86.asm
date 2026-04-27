@@ -35,5 +35,5 @@ my_copy_x86 PROC C dst:dword, src:dword, len:dword
 		pop edi
 		pop esi
 		ret
-my_copy ENDP
+my_copy_x86 ENDP
 END
