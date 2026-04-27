@@ -2,6 +2,9 @@
 *.obj
 *.exe
 *.com
+*.OBJ
+*.EXE
+*.COM
 
 # Optional assembler/linker byproducts
 *.map
