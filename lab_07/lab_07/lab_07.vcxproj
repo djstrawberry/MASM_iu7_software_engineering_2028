@@ -131,9 +131,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="copy.asm">
+    <None Include="copy_x86.asm">
       <FileType>Document</FileType>
-    </MASM>
+    </None>
+    <MASM Include="copy_x64.asm" />
+    <MASM Include="my_strlen_x64.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

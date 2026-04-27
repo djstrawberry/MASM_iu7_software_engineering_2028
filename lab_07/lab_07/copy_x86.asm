@@ -2,7 +2,7 @@
 .MODEL FLAT, C
 .CODE
 
-my_copy PROC C dst:dword, src:dword, len:dword
+my_copy_x86 PROC C dst:dword, src:dword, len:dword
 	push esi
 	push edi
 
